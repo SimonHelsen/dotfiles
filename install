@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
 require 'fileutils'
-require 'dir'
 
 PLATFORM_DARWIN = "Darwin"
 PLATFORM_LINUX = "Linux"
