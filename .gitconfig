@@ -1,0 +1,29 @@
+[credential]
+	helper = 
+	helper = store --file /opt/dev/var/private/git_credential_store
+[core]
+	commitGraph = true
+	editor = nano
+[diff]
+	algorithm = patience
+[gc]
+	writeCommitGraph = true
+[protocol]
+	version = 2
+[url "https://github.com/Shopify/"]
+	insteadOf = git@github.com:Shopify/
+	insteadOf = git@github.com:shopify/
+	insteadOf = ssh://git@github.com/Shopify/
+	insteadOf = ssh://git@github.com/shopify/
+[pull]
+	rebase = true
+[user]
+	name = Simon Helsen
+	email = simon.helsen@shopify.com
+[alias]
+	pu = push --set-upstream origin
+	p = push --no-verify --force-with-lease -u origin
+  c = commit --no-verify
+  h2 = rebase -i HEAD~2
+[push]
+	default = current

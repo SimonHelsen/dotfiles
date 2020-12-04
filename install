@@ -1,0 +1,56 @@
+#!/usr/bin/env ruby
+
+require 'fileutils'
+
+PLATFORM_DARWIN = "Darwin"
+PLATFORM_LINUX = "Linux"
+PLATFORM = `uname`.chomp
+
+DEPENDENCIES = [ "git"]
+GEMS = ["solargraph", "$HOME/.repos/dotfiles/customGems/debase-2.3.0.gem", "$HOME/.repos/dotfiles/customGems/ruby-debug-ide-2.3.0.gem"]
+
+def system_or_exit1(*args)
+    unless system(*args)
+      puts "ERROR: Command failed. Aborting."
+      exit 1
+    end
+    true
+end
+
+def has_cmd?(cmd)
+    system("which #{cmd}", STDOUT => '/dev/null') == true
+end
+  
+def install(cmd)
+    if PLATFORM == PLATFORM_LINUX
+      system_or_exit1("sudo apt-get -y install #{cmd}")
+    elsif PLATFORM == PLATFORM_DARWIN
+      system_or_exit1("brew install #{cmd}")
+    else
+      raise "Unsupported Platform: #{PLATFORM}"
+    end
+end
+
+def install_gem(_gem)
+    system_or_exit1("sudo gem install #{_gem}")
+    system_or_exit1("gem install #{_gem}")
+end
+
+puts "1. Cloning dotfiles"
+system_or_exit1("mkdir -p $HOME/.repos")
+system_or_exit1("git clone --recursive https://github.com/shelsen/dotfiles $HOME/.repos/dotfiles")
+
+puts "2. Installing dependencies"
+DEPENDENCIES.each do |app|
+  unless has_cmd?(app)
+    puts "Installing: #{app}"
+    install(app)
+  end
+end
+
+puts "3. Installing gems"
+GEMS.each do |gem|
+    puts "Installing Ruby Gem: #{gem}"
+    install_gem(gem)
+end
+

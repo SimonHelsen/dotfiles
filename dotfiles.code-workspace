@@ -1,0 +1,29 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"\"instal\"l": "\"ruby\""
+		},
+		"solargraph.completion": false,
+		"solargraph.definitions": false,
+		"solargraph.checkGemVersion": false,
+		
+		"ruby.rubocop.onSave": false,
+		"ruby.rubocop.suppressRubocopWarnings": true,
+		"ruby.rubocop.useBundler": false,
+
+		"ruby.format": "standard",
+    "[ruby]": {
+      "editor.defaultFormatter": "hoovercj.ruby-linter"
+		},
+		
+		"ruby.useLanguageServer": false,
+
+    "ruby.lint": {
+    },
+	}
+}
