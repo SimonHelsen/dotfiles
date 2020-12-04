@@ -59,8 +59,8 @@ def move_git_dot_files
   FileUtils.mv("#{ENV['HOME']}//.repos/dotfiles/.gitignore", "#{ENV['HOME']}/.gitignore")
 end
 
-def amend_bash_rc
-  bash_rc = "#{ENV['HOME']}/.bash_rc"
+def amend_bashrc
+  bash_rc = "#{ENV['HOME']}/.bashrc"
   File.write(bash_rc, BASH_GIT_PROMPT_TEXT, mode: 'a')
 end
 
