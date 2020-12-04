@@ -1,12 +1,14 @@
 #!/usr/bin/env ruby
 
 require 'fileutils'
+require 'dir'
 
 PLATFORM_DARWIN = "Darwin"
 PLATFORM_LINUX = "Linux"
 PLATFORM = `uname`.chomp
+WORKSPACE = "/src/github.com/shopify/shopify"
 
-DEPENDENCIES = [ "git"]
+DEPENDENCIES = [ "git", "nano", "ruby-dev", "bash-git-prompt"]
 GEMS = ["solargraph", "$HOME/.repos/dotfiles/customGems/debase-2.3.0.gem", "$HOME/.repos/dotfiles/customGems/ruby-debug-ide-2.3.0.gem"]
 
 def system_or_exit1(*args)
@@ -36,9 +38,30 @@ def install_gem(_gem)
     system_or_exit1("gem install #{_gem}")
 end
 
+def move_git_dot_files
+  if File.exist?("#{ENV['HOME']}/.gitconfig")
+    puts "WARN: Moving #{ENV['HOME']}/.gitconfig to #{ENV['HOME']}/.gitconfig.default"
+    puts "      This file is load by the dotfile .gitconfig"
+    FileUtils.mv("#{ENV['HOME']}/.gitconfig", "#{ENV['HOME']}/.gitconfig.default")
+  end
+  FileUtils.mv("#{ENV['HOME']}//.repos/dotfiles/.gitconfig", "#{ENV['HOME']}/.gitconfig")
+  FileUtils.mv("#{ENV['HOME']}//.repos/dotfiles/.gitignore", "#{ENV['HOME']}/.gitignore")
+end
+
+def setup_vscode_files
+  FileUtils.mv("#{ENV['HOME']}//.repos/dotfiles/launch.json", "#{workspace}/.vscode")
+  FileUtils.mv("#{ENV['HOME']}//.repos/dotfiles/settings.json", "#{workspace}/.vscode")
+  FileUtils.mv("#{ENV['HOME']}//.repos/dotfiles/.solargraph.yml", workspace)
+  FileUtils.mv("#{ENV['HOME']}//.repos/dotfiles/debug", "#{workspace}/tmp")
+end
+
 puts "1. Cloning dotfiles"
 system_or_exit1("mkdir -p $HOME/.repos")
-system_or_exit1("git clone --recursive https://github.com/shelsen/dotfiles $HOME/.repos/dotfiles")
+if File.exist?("#{ENV['HOME']}/.repos/dotfiles")
+  system_or_exit1("git pull $HOME/.repos/dotfiles")
+else
+  system_or_exit1("git clone --recursive https://github.com/shelsen/dotfiles $HOME/.repos/dotfiles")
+end
 
 puts "2. Installing dependencies"
 DEPENDENCIES.each do |app|
@@ -54,3 +77,8 @@ GEMS.each do |gem|
     install_gem(gem)
 end
 
+puts "4. Copy over git dot files"
+move_git_dot_files
+
+puts "4. Copy over vscode files"
+setup_vscode_files

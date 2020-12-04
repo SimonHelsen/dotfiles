@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+
+def system_or_exit1(*args)
+    unless system(*args)
+      puts "ERROR: Command failed. Aborting."
+      exit 1
+    end
+    true
+end
+
+system_or_exit1("#{ENV['GEM_HOME']}/bin/rdebug-ide -- bin/rails server -b 127.0.0.1")
+
+
+

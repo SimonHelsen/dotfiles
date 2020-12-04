@@ -6,7 +6,8 @@
 	],
 	"settings": {
 		"files.associations": {
-			"\"instal\"l": "\"ruby\""
+			"\"instal\"l": "\"ruby\"",
+			"\"debu\"g": "\"ruby\""
 		},
 		"solargraph.completion": false,
 		"solargraph.definitions": false,
@@ -15,6 +16,7 @@
 		"ruby.rubocop.onSave": false,
 		"ruby.rubocop.suppressRubocopWarnings": true,
 		"ruby.rubocop.useBundler": false,
+		"ruby.rubocop.executePath": "rubocop", // use rubocop for formatting
 
 		"ruby.format": "standard",
     "[ruby]": {
