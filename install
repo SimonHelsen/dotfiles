@@ -5,10 +5,17 @@ require 'fileutils'
 PLATFORM_DARWIN = "Darwin"
 PLATFORM_LINUX = "Linux"
 PLATFORM = `uname`.chomp
-WORKSPACE = "/src/github.com/shopify/shopify"
 
-DEPENDENCIES = [ "git", "nano", "ruby-dev", "bash-git-prompt"]
+DEPENDENCIES = [ "git", "nano", "ruby-dev"]
 GEMS = ["solargraph", "$HOME/.repos/dotfiles/customGems/debase-2.3.0.gem", "$HOME/.repos/dotfiles/customGems/ruby-debug-ide-2.3.0.gem"]
+
+BASH_GIT_PROMPT_TEXT =
+%{
+  if [ -f "$HOME/.bash-git-prompt/gitprompt.sh" ]; then
+    GIT_PROMPT_ONLY_IN_REPO=1
+    source $HOME/.bash-git-prompt/gitprompt.sh
+  fi
+}
 
 def system_or_exit1(*args)
     unless system(*args)
@@ -37,6 +44,11 @@ def install_gem(_gem)
     system_or_exit1("gem install #{_gem}")
 end
 
+def install_git_prompt
+  FileUtils.rm_rf("#{ENV['HOME']}/.bash-git-prompt")
+  system_or_exit1("git clone https://github.com/magicmonty/bash-git-prompt.git #{ENV['HOME']}/.bash-git-prompt --depth=1")
+end
+
 def move_git_dot_files
   if File.exist?("#{ENV['HOME']}/.gitconfig")
     puts "WARN: Moving #{ENV['HOME']}/.gitconfig to #{ENV['HOME']}/.gitconfig.default"
@@ -47,20 +59,24 @@ def move_git_dot_files
   FileUtils.mv("#{ENV['HOME']}//.repos/dotfiles/.gitignore", "#{ENV['HOME']}/.gitignore")
 end
 
-def setup_vscode_files
-  FileUtils.mv("#{ENV['HOME']}//.repos/dotfiles/launch.json", "#{workspace}/.vscode")
-  FileUtils.mv("#{ENV['HOME']}//.repos/dotfiles/settings.json", "#{workspace}/.vscode")
-  FileUtils.mv("#{ENV['HOME']}//.repos/dotfiles/.solargraph.yml", workspace)
-  FileUtils.mv("#{ENV['HOME']}//.repos/dotfiles/debug", "#{workspace}/tmp")
+def amend_bash_rc
+  bash_rc = "#{ENV['HOME']}/.bash_rc"
+  File.write(bash_rc, BASH_GIT_PROMPT_TEXT, mode: 'a')
 end
 
-puts "1. Cloning dotfiles"
-system_or_exit1("mkdir -p $HOME/.repos")
-if File.exist?("#{ENV['HOME']}/.repos/dotfiles")
-  system_or_exit1("git pull $HOME/.repos/dotfiles")
-else
-  system_or_exit1("git clone --recursive https://github.com/shelsen/dotfiles $HOME/.repos/dotfiles")
+def setup_vscode_files
+  workspace = "/src/github.com/shopify/shopify"
+
+  FileUtils.mv("#{ENV['HOME']}/.repos/dotfiles/launch.json", "#{workspace}/.vscode")
+  FileUtils.mv("#{ENV['HOME']}/.repos/dotfiles/settings.json", "#{workspace}/.vscode")
+  FileUtils.mv("#{ENV['HOME']}/.repos/dotfiles/.solargraph.yml", workspace)
+  FileUtils.mv("#{ENV['HOME']}/.repos/dotfiles/debug", "#{workspace}/tmp")
 end
+
+puts "1. Cloning shelsen/dotfiles"
+FileUtils.rm_rf("#{ENV['HOME']}/.repos")
+system_or_exit1("mkdir -p $HOME/.repos")
+system_or_exit1("git clone --recursive https://github.com/shelsen/dotfiles $HOME/.repos/dotfiles")
 
 puts "2. Installing dependencies"
 DEPENDENCIES.each do |app|
@@ -76,8 +92,17 @@ GEMS.each do |gem|
     install_gem(gem)
 end
 
-puts "4. Copy over git dot files"
+puts "4. Install bash-git-prompt"
+install_git_prompt
+
+puts "5. Copy over git dot files"
 move_git_dot_files
 
-puts "4. Copy over vscode files"
+puts "6. Amend bash_rc"
+amend_bash_rc
+
+puts "7. Copy over vscode files"
 setup_vscode_files
+
+puts "8. Refresh shell"
+system_or_exit1("exec bash")
