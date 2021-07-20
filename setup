@@ -53,10 +53,13 @@ def move_git_dot_files
   FileUtils.mv("#{HOME}//dotfiles/.gitignore", "#{HOME}/.gitignore")
 end
 
-def setup_bash
+def append_git_prompt
   bash_rc = "#{HOME}/.bashrc"
   File.write(bash_rc, BASH_GIT_PROMPT_TEXT, mode: 'a')
-  system_or_exit1("sudo chsh -s /bin/bash")
+end
+
+def switch_to_bash
+  system_or_exit1("sudo chsh -s /bin/bash spin")
 end
 
 # def setup_vscode_files
@@ -73,8 +76,8 @@ end
 # system_or_exit1("mkdir -p $HOME/.repos")
 # system_or_exit1("git clone --recursive https://github.com/shelsen/dotfiles $HOME/.repos/dotfiles")
 
-puts "1. Setup Bash"
-setup_bash
+puts "1. Append Git Prompt"
+append_git_prompt
 
 puts "2. Installing dependencies"
 DEPENDENCIES.each do |app|
@@ -96,9 +99,9 @@ install_git_prompt
 puts "5. Copy over git dot files"
 move_git_dot_files
 
+puts "7. Switch to bash"
+switch_to_bash
 
 # puts "6. Copy over vscode files"
 # setup_vscode_files
 
-# puts "7. Refresh shell"
-# system_or_exit1("bash")
