@@ -17,6 +17,11 @@ BASH_GIT_PROMPT_TEXT =
   fi
 }
 
+BASH_LOGIN_READS_RC =
+%{
+  case "$-" in *i*) if [ -r ~/.bashrc ]; then . ~/.bashrc; fi;; esac
+}
+
 def system_or_exit1(*args)
     unless system(*args)
       puts "ERROR: Command failed. Aborting."
@@ -55,7 +60,9 @@ end
 
 def append_git_prompt
   bash_rc = "#{HOME}/.bashrc"
+  bash_login = "#{HOME}/.bash_login"
   File.write(bash_rc, BASH_GIT_PROMPT_TEXT, mode: 'a')
+  File.write(bash_login, BASH_LOGIN_READS_RC, mode: 'a')
 end
 
 def switch_to_bash
@@ -99,7 +106,7 @@ install_git_prompt
 puts "5. Copy over git dot files"
 move_git_dot_files
 
-puts "7. Switch to bash"
+puts "6. Switch to bash"
 switch_to_bash
 
 # puts "6. Copy over vscode files"
