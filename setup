@@ -7,7 +7,7 @@ exit 0 if !ENV['SPIN']
 
 HOME = ENV['HOME']
 DEPENDENCIES = [ "nano" ]
-GEMS = ["$HOME/.repos/dotfiles/customGems/debase-2.3.0.gem", "$HOME/.repos/dotfiles/customGems/ruby-debug-ide-2.3.0.gem"]
+GEMS = ["$HOME/dotfiles/customGems/debase-2.3.0.gem", "$HOME/dotfiles/customGems/ruby-debug-ide-2.3.0.gem"]
 
 BASH_GIT_PROMPT_TEXT =
 %{
@@ -49,8 +49,8 @@ def move_git_dot_files
     puts "      This file is load by the dotfile .gitconfig"
     FileUtils.mv("#{HOME}/.gitconfig", "#{HOME}/.gitconfig.default")
   end
-  FileUtils.mv("#{HOME}//.repos/dotfiles/.gitconfig", "#{HOME}/.gitconfig")
-  FileUtils.mv("#{HOME}//.repos/dotfiles/.gitignore", "#{HOME}/.gitignore")
+  FileUtils.mv("#{HOME}//dotfiles/.gitconfig", "#{HOME}/.gitconfig")
+  FileUtils.mv("#{HOME}//dotfiles/.gitignore", "#{HOME}/.gitignore")
 end
 
 def setup_bash
@@ -62,10 +62,10 @@ end
 # def setup_vscode_files
 #   workspace = "/src/github.com/shopify/shopify"
 
-#   FileUtils.mv("#{HOME}/.repos/dotfiles/launch.json", "#{workspace}/.vscode")
-#   FileUtils.mv("#{HOME}/.repos/dotfiles/settings.json", "#{workspace}/.vscode")
-#   FileUtils.mv("#{HOME}/.repos/dotfiles/.solargraph.yml", workspace)
-#   FileUtils.mv("#{HOME}/.repos/dotfiles/debug", "#{workspace}/tmp")
+#   FileUtils.mv("#{HOME}/dotfiles/launch.json", "#{workspace}/.vscode")
+#   FileUtils.mv("#{HOME}/dotfiles/settings.json", "#{workspace}/.vscode")
+#   FileUtils.mv("#{HOME}/dotfiles/.solargraph.yml", workspace)
+#   FileUtils.mv("#{HOME}/dotfiles/debug", "#{workspace}/tmp")
 # end
 
 # puts "1. Cloning shelsen/dotfiles"
