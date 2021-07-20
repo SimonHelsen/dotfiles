@@ -1,0 +1,104 @@
+#!/usr/bin/env ruby
+
+require 'fileutils'
+
+# only for spin
+exit 0 if !ENV['SPIN'] 
+
+HOME = ENV['HOME']
+DEPENDENCIES = [ "nano" ]
+GEMS = ["$HOME/.repos/dotfiles/customGems/debase-2.3.0.gem", "$HOME/.repos/dotfiles/customGems/ruby-debug-ide-2.3.0.gem"]
+
+BASH_GIT_PROMPT_TEXT =
+%{
+  if [ -f "$HOME/.bash-git-prompt/gitprompt.sh" ]; then
+    GIT_PROMPT_ONLY_IN_REPO=1
+    source $HOME/.bash-git-prompt/gitprompt.sh
+  fi
+}
+
+def system_or_exit1(*args)
+    unless system(*args)
+      puts "ERROR: Command failed. Aborting."
+      exit 1
+    end
+    true
+end
+
+def has_cmd?(cmd)
+    system("which #{cmd}", STDOUT => '/dev/null') == true
+end
+  
+def install(cmd)
+    system_or_exit1("sudo apt-get -y install #{cmd}")
+end
+
+def install_gem(_gem)
+    system_or_exit1("sudo gem install #{_gem}")
+    # system_or_exit1("gem install #{_gem}")
+end
+
+def install_git_prompt
+  FileUtils.rm_rf("#{HOME}/.bash-git-prompt")
+  system_or_exit1("git clone https://github.com/magicmonty/bash-git-prompt.git #{HOME}/.bash-git-prompt --depth=1")
+end
+
+def move_git_dot_files
+  if File.exist?("#{HOME}/.gitconfig")
+    puts "WARN: Moving #{HOME}/.gitconfig to #{HOME}/.gitconfig.default"
+    puts "      This file is load by the dotfile .gitconfig"
+    FileUtils.mv("#{HOME}/.gitconfig", "#{HOME}/.gitconfig.default")
+  end
+  FileUtils.mv("#{HOME}//.repos/dotfiles/.gitconfig", "#{HOME}/.gitconfig")
+  FileUtils.mv("#{HOME}//.repos/dotfiles/.gitignore", "#{HOME}/.gitignore")
+end
+
+def setup_bash
+  bash_rc = "#{HOME}/.bashrc"
+  File.write(bash_rc, BASH_GIT_PROMPT_TEXT, mode: 'a')
+  system_or_exit1("sudo chsh -s /bin/bash")
+end
+
+# def setup_vscode_files
+#   workspace = "/src/github.com/shopify/shopify"
+
+#   FileUtils.mv("#{HOME}/.repos/dotfiles/launch.json", "#{workspace}/.vscode")
+#   FileUtils.mv("#{HOME}/.repos/dotfiles/settings.json", "#{workspace}/.vscode")
+#   FileUtils.mv("#{HOME}/.repos/dotfiles/.solargraph.yml", workspace)
+#   FileUtils.mv("#{HOME}/.repos/dotfiles/debug", "#{workspace}/tmp")
+# end
+
+# puts "1. Cloning shelsen/dotfiles"
+# FileUtils.rm_rf("#{HOME}/.repos")
+# system_or_exit1("mkdir -p $HOME/.repos")
+# system_or_exit1("git clone --recursive https://github.com/shelsen/dotfiles $HOME/.repos/dotfiles")
+
+puts "1. Setup Bash"
+setup_bash
+
+puts "2. Installing dependencies"
+DEPENDENCIES.each do |app|
+  unless has_cmd?(app)
+    puts "Installing: #{app}"
+    install(app)
+  end
+end
+
+puts "3. Installing gems"
+GEMS.each do |gem|
+    puts "Installing Ruby Gem: #{gem}"
+    install_gem(gem)
+end
+
+puts "4. Install bash-git-prompt"
+install_git_prompt
+
+puts "5. Copy over git dot files"
+move_git_dot_files
+
+
+# puts "6. Copy over vscode files"
+# setup_vscode_files
+
+# puts "7. Refresh shell"
+# system_or_exit1("bash")

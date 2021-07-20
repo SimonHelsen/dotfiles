@@ -98,11 +98,11 @@ install_git_prompt
 puts "5. Copy over git dot files"
 move_git_dot_files
 
-puts "6. Amend bash_rc"
-amend_bash_rc
+puts "6. Amend bashrc"
+amend_bashrc
 
 puts "7. Copy over vscode files"
 setup_vscode_files
 
 puts "8. Refresh shell"
-system_or_exit1("exec bash")
+system_or_exit1("bash")
