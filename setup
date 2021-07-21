@@ -6,8 +6,10 @@ require 'fileutils'
 exit 0 if !ENV['SPIN'] 
 
 HOME = ENV['HOME']
+REPO = "/src/github.com/shopify/shopify"
+
 DEPENDENCIES = [ "nano" ]
-GEMS = ["$HOME/dotfiles/customGems/debase-2.3.2.gem", "$HOME/dotfiles/customGems/ruby-debug-ide-2.3.1.gem"]
+GEMS = ["$HOME/dotfiles/customGems/debase-2.3.2.gem", "$HOME/dotfiles/customGems/ruby-debug-ide-2.3.1.gem", "$HOME/dotfiles/customGems/debase-0.2.5.beta2.gem", "$HOME/dotfiles/customGems/ruby-debug-ide-0.7.1.beta3.gem"]
 
 BASH_GIT_PROMPT_TEXT =
 %{
@@ -54,8 +56,8 @@ def move_git_dot_files
     puts "      This file is load by the dotfile .gitconfig"
     FileUtils.mv("#{HOME}/.gitconfig", "#{HOME}/.gitconfig.default")
   end
-  FileUtils.cp("#{HOME}//dotfiles/.gitconfig", "#{HOME}/.gitconfig")
-  FileUtils.cp("#{HOME}//dotfiles/.gitignore", "#{HOME}/.gitignore")
+  FileUtils.cp("#{HOME}/dotfiles/.gitconfig", "#{HOME}/.gitconfig")
+  FileUtils.cp("#{HOME}/dotfiles/.gitignore", "#{HOME}/.gitignore")
 end
 
 def append_git_prompt
@@ -69,6 +71,22 @@ def switch_to_bash
   system_or_exit1("sudo chsh -s /bin/bash spin")
 end
 
+def install_debugger
+  if !File.exist?("#{REPO}/.vscode/launch.json")
+    FileUtils.cp("#{HOME}/dotfiles/launch.json", "#{REPO}/.vscode/launch.json")
+  end
+
+  # for Ruby
+  if ENV['RUBY_VERSION'] 
+    FileUtils.cp("#{HOME}/dotfiles/rdebug", "#{REPO}/.spin/bin")
+  end
+
+  # for Node
+  if ENV['NODE_VERSION'] 
+
+  end
+end
+
 # def setup_vscode_files
 #   workspace = "/src/github.com/shopify/shopify"
 
@@ -78,10 +96,6 @@ end
 #   FileUtils.cp("#{HOME}/dotfiles/debug", "#{workspace}/tmp")
 # end
 
-# puts "1. Cloning shelsen/dotfiles"
-# FileUtils.rm_rf("#{HOME}/.repos")
-# system_or_exit1("mkdir -p $HOME/.repos")
-# system_or_exit1("git clone --recursive https://github.com/shelsen/dotfiles $HOME/.repos/dotfiles")
 
 puts "1. Append Git Prompt"
 append_git_prompt
@@ -106,9 +120,10 @@ install_git_prompt
 puts "5. Copy over git dot files"
 move_git_dot_files
 
-puts "6. Switch to bash"
+puts "6. Set up debugging"
+install_debugger
+
+puts "7. Switch to bash"
 switch_to_bash
 
-# puts "6. Copy over vscode files"
-# setup_vscode_files
 
