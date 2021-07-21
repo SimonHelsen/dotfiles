@@ -7,7 +7,7 @@ exit 0 if !ENV['SPIN']
 
 HOME = ENV['HOME']
 DEPENDENCIES = [ "nano" ]
-GEMS = ["$HOME/dotfiles/customGems/debase-2.3.0.gem", "$HOME/dotfiles/customGems/ruby-debug-ide-2.3.0.gem"]
+GEMS = ["$HOME/dotfiles/customGems/debase-2.3.2.gem", "$HOME/dotfiles/customGems/ruby-debug-ide-2.3.1.gem"]
 
 BASH_GIT_PROMPT_TEXT =
 %{
