@@ -12,7 +12,7 @@ GEMS = ["$HOME/dotfiles/customGems/debase-2.3.2.gem", "$HOME/dotfiles/customGems
 BASH_GIT_PROMPT_TEXT =
 %{
   if [ -f "$HOME/.bash-git-prompt/gitprompt.sh" ]; then
-    GIT_PROMPT_ONLY_IN_REPO=1
+    GIT_PROMPT_ONLY_IN_REPO=0
     source $HOME/.bash-git-prompt/gitprompt.sh
   fi
 }
@@ -54,8 +54,8 @@ def move_git_dot_files
     puts "      This file is load by the dotfile .gitconfig"
     FileUtils.mv("#{HOME}/.gitconfig", "#{HOME}/.gitconfig.default")
   end
-  FileUtils.mv("#{HOME}//dotfiles/.gitconfig", "#{HOME}/.gitconfig")
-  FileUtils.mv("#{HOME}//dotfiles/.gitignore", "#{HOME}/.gitignore")
+  FileUtils.cp("#{HOME}//dotfiles/.gitconfig", "#{HOME}/.gitconfig")
+  FileUtils.cp("#{HOME}//dotfiles/.gitignore", "#{HOME}/.gitignore")
 end
 
 def append_git_prompt
@@ -72,10 +72,10 @@ end
 # def setup_vscode_files
 #   workspace = "/src/github.com/shopify/shopify"
 
-#   FileUtils.mv("#{HOME}/dotfiles/launch.json", "#{workspace}/.vscode")
-#   FileUtils.mv("#{HOME}/dotfiles/settings.json", "#{workspace}/.vscode")
-#   FileUtils.mv("#{HOME}/dotfiles/.solargraph.yml", workspace)
-#   FileUtils.mv("#{HOME}/dotfiles/debug", "#{workspace}/tmp")
+#   FileUtils.cp("#{HOME}/dotfiles/launch.json", "#{workspace}/.vscode")
+#   FileUtils.cp("#{HOME}/dotfiles/settings.json", "#{workspace}/.vscode")
+#   FileUtils.cp("#{HOME}/dotfiles/.solargraph.yml", workspace)
+#   FileUtils.cp("#{HOME}/dotfiles/debug", "#{workspace}/tmp")
 # end
 
 # puts "1. Cloning shelsen/dotfiles"
