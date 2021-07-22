@@ -1,15 +1,19 @@
 #!/usr/bin/env ruby
-
 require 'fileutils'
 
-# only for spin
-exit 0 if !ENV['SPIN'] 
+APPS = [ "nano" ]
+
+GEMS = ["$HOME/dotfiles/customGems/debase-2.3.2.gem", 
+        "$HOME/dotfiles/customGems/ruby-debug-ide-2.3.1.gem", 
+        "$HOME/dotfiles/customGems/debase-0.2.5.beta2.gem", 
+        "$HOME/dotfiles/customGems/ruby-debug-ide-0.7.1.beta3.gem"]
 
 HOME = ENV['HOME']
-REPO = "/src/github.com/shopify/shopify"
+REPO = ENV['SPIN_REPO_SOURCE_PATH']
+IS_SPIN = ENV['SPIN'] 
 
-DEPENDENCIES = [ "nano" ]
-GEMS = ["$HOME/dotfiles/customGems/debase-2.3.2.gem", "$HOME/dotfiles/customGems/ruby-debug-ide-2.3.1.gem", "$HOME/dotfiles/customGems/debase-0.2.5.beta2.gem", "$HOME/dotfiles/customGems/ruby-debug-ide-0.7.1.beta3.gem"]
+# only for spin
+exit 0 if !IS_SPIN
 
 BASH_GIT_PROMPT_TEXT =
 %{
@@ -32,17 +36,42 @@ def system_or_exit1(*args)
     true
 end
 
-def has_cmd?(cmd)
-    system("which #{cmd}", STDOUT => '/dev/null') == true
+def has_app?(app)
+  system("which #{app}", STDOUT => '/dev/null') == true
 end
   
-def install(cmd)
-    system_or_exit1("sudo apt-get -y install #{cmd}")
+def install(app)
+  unless has_app?(app)
+    puts "Installing: #{app}"
+    system_or_exit1("sudo apt-get -y install #{app}")
+  end
+end
+
+def install_apps
+  APPS.each do |app|
+    install(app)
+  end
 end
 
 def install_gem(_gem)
-    system_or_exit1("sudo gem install #{_gem}")
-    system_or_exit1("gem install #{_gem}")
+  puts "Installing Ruby Gem: #{gem}"
+  system_or_exit1("sudo gem install #{_gem}")
+  system_or_exit1("gem install #{_gem}")
+end
+
+def install_gems
+  if ENV['RUBY_VERSION'] 
+    GEMS.each do |gem|
+      install_gem(gem)
+    end
+  end
+end
+
+def append_git_prompt
+  bash_rc = "#{HOME}/.bashrc"
+  bash_login = "#{HOME}/.bash_login"
+  File.write(bash_rc, BASH_GIT_PROMPT_TEXT, mode: 'a')
+  File.write(bash_login, BASH_LOGIN_READS_RC, mode: 'a')
 end
 
 def install_git_prompt
@@ -60,11 +89,9 @@ def move_git_dot_files
   FileUtils.cp("#{HOME}/dotfiles/.gitignore", "#{HOME}/.gitignore")
 end
 
-def append_git_prompt
-  bash_rc = "#{HOME}/.bashrc"
-  bash_login = "#{HOME}/.bash_login"
-  File.write(bash_rc, BASH_GIT_PROMPT_TEXT, mode: 'a')
-  File.write(bash_login, BASH_LOGIN_READS_RC, mode: 'a')
+def set_tmux_config
+  FileUtils.cp("#{HOME}/dotfiles/.tmux.conf", "#{HOME}/.tmux.conf")
+  system_or_exit1("tmux source-file #{HOME}/.tmux.conf")
 end
 
 def switch_to_bash
@@ -81,10 +108,10 @@ def install_debugger
     FileUtils.cp("#{HOME}/dotfiles/rdebug", "#{REPO}/.spin/bin")
   end
 
-  # for Node
-  if ENV['NODE_VERSION'] 
+  # # for Node
+  # if ENV['NODE_VERSION'] 
 
-  end
+  # end
 end
 
 # def setup_vscode_files
@@ -96,23 +123,14 @@ end
 #   FileUtils.cp("#{HOME}/dotfiles/debug", "#{workspace}/tmp")
 # end
 
-
 puts "1. Append Git Prompt"
 append_git_prompt
 
 puts "2. Installing dependencies"
-DEPENDENCIES.each do |app|
-  unless has_cmd?(app)
-    puts "Installing: #{app}"
-    install(app)
-  end
-end
+install_apps
 
 puts "3. Installing gems"
-GEMS.each do |gem|
-    puts "Installing Ruby Gem: #{gem}"
-    install_gem(gem)
-end
+install_gems
 
 puts "4. Install bash-git-prompt"
 install_git_prompt
@@ -122,6 +140,9 @@ move_git_dot_files
 
 puts "6. Set up debugging"
 install_debugger
+
+puts "7. Set up Tmux"
+set_tmux_config
 
 puts "7. Switch to bash"
 switch_to_bash

@@ -56,3 +56,5 @@ vgcore*
 .TODO
 
 .solargraph.yml
+rdebug
+launch.json
